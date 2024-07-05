@@ -1,2 +1,1 @@
-# NotesAppMongoDB
-leon and gile project
+This is our final project in BackEnd
