@@ -4,10 +4,12 @@ const app = express()
 
 app.use(express.json())
 
+
+
 app.use('/tasks',routerTasks)
 
 
-app.get('/',(req,res)=>{
+app.get('/api',(req,res)=>{
     console.log('hihihihi')
     res.send('aaaaaa')
 })
