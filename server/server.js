@@ -1,17 +1,4 @@
 import express from 'express'
-import routerTasks from './routers/tasks/tasksRouter.js'
-const app = express()
-
-app.use(express.json())
-
-
-
-app.use('/tasks',routerTasks)
-
-
-app.get('/api',(req,res)=>{
-    console.log('hihihihi')
-    res.send('aaaaaa')
-})
+import {app} from './app.js'
 
 app.listen(3000,()=>console.log('working'))
