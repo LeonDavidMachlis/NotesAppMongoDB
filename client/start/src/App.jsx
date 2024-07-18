@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./index.css";
 import axios from "axios";
 import NavBar from "./components/NavBar";
+import Notes from "./components/notes/Notes";
 
 function App() {
   useEffect(() => {
@@ -15,6 +16,7 @@ function App() {
     <div className="min-h-screen">
         <NavBar />
       <div className="container mx-auto ">
+        <Notes/>
       </div>
     </div>
   );
