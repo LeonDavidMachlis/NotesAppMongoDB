@@ -8,6 +8,6 @@ router.get('/',(req,res)=>{
     res.send('a')
 })
 router.route('/').post(tasksControllers.postTask)
-
+router.route('/:userId').get(tasksControllers.getTasksByUser)
 
 export default router

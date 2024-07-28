@@ -13,6 +13,10 @@ const schema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  user: {
+    type: String,
+    required: [true, "pls enter your usrerName"],
+  },
 });
 
 const taskModel = mongoose.model("tasks", schema);
