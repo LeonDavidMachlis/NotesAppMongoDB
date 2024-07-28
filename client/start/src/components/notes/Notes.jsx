@@ -1,28 +1,37 @@
 import { useState } from "react";
-import {auth} from '../../../config/fire-base'
-import axios from 'axios'
+import { auth } from "../../../config/fire-base";
+import axios from "axios";
 export default function Notes() {
   const [tasks, setTasks] = useState([]);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [editedTask, setEditedTask] = useState({ id: null, title: "" });
 
-  const addTask = async() => {
-    if (!newTaskName || !newTaskTitle) return;
-    const newTaskData = {      
+  const getTask = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user !== null) {
+        const userTask = await axios.get(`/api/tasks/${user.uid}`);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const addTask = async () => {
+    if (!newTaskName || !newTaskTitle || auth.currentUser === null) return;
+    const newTaskData = {
+      user: auth.currentUser.uid,
       name: newTaskName,
       title: newTaskTitle,
       completed: false,
     };
-    try{
-      const newTask = await axios.post('/api/tasks',newTaskData)
-      console.log(newTask.data)
-    }catch(e){
-      console.error(e)
+    try {
+      const newTask = await axios.post("/api/tasks", newTaskData);
+      console.log(newTask.data);
+    } catch (e) {
+      console.error(e);
     }
-    // setTasks([...tasks, newTask]);
-    // setNewTaskName("");
-    // setNewTaskTitle("");
   };
 
   const deleteTask = (taskId) => {

@@ -3,6 +3,7 @@ import "./index.css";
 import axios from "axios";
 import NavBar from "./components/NavBar";
 import Notes from "./components/notes/Notes";
+import { Outlet } from "react-router-dom";
 
 function App() {
   useEffect(() => {
@@ -15,9 +16,7 @@ function App() {
   return (
     <div className="min-h-screen">
         <NavBar />
-      <div className="container mx-auto ">
-        <Notes/>
-      </div>
+        <Outlet/>
     </div>
   );
 }

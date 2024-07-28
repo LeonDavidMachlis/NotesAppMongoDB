@@ -18,7 +18,7 @@ const NavBar = () => {
           </li>
         </ul>
         <ul className="flex gap-5">
-          <li>create note</li>
+          <Link to="/notes">create note</Link>
         </ul>
       </nav>
     </div>

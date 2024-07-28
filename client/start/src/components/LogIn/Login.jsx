@@ -3,7 +3,7 @@ import { auth } from "../../../config/fire-base";
 import {
   onAuthStateChanged,
   signOut,
-  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 const Login = () => {
@@ -24,7 +24,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      await createUserWithEmailAndPassword(
+      await signInWithEmailAndPassword(
         auth,
         email.current.value,
         password.current.value
@@ -46,7 +46,7 @@ const Login = () => {
           onSubmit={formSubmit}
         >
           <h2 className="text-4xl font-bold dark:text-white text-center relative bottom-8">
-            הרשמה
+            התחברות
           </h2>
           <label className="input input-bordered flex items-center gap-2">
             <svg
