@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 import taskModel from "../model/TaskModel.js";
 
-export const getTask = async (req, res) => {
+export const getTasks = async (req, res) => {
   try {
-    console.log(res.body.params);
-    return res.status(201).json({});
+    const tasks = await taskModel.find({});
+    return res.status(200).json(tasks);
   } catch (e) {
     return res.status(404).json({ massage: "error", data: null });
   }
@@ -26,7 +26,7 @@ export const deleteTask = async (req, res) => {
   // console.log(req.body.params)
   try {
     console.log(req.params);
-    const isDeleted = taskModel.findByIdAndDelete(req.params.taskId);
+    const isDeleted = await taskModel.findByIdAndDelete(req.params.taskId);
     return res.status(204).json({
       status: "sucssess",
       data: null,
@@ -36,15 +36,32 @@ export const deleteTask = async (req, res) => {
   }
 };
 
-export const getTasksByUser = async (req, res) => {
-  console.log(req.params);
+export const putTask = async (req, res) => {
+  // console.log(req.body.params)
   try {
-    const userTasks = await taskModel
-      .find({})
-      .where("user")
-      .equals(req.params.userId);
-    console.log(userTasks);
-    res.send(userTasks);
+    console.log(req.params);
+    const updatedTask = await taskModel.findByIdAndUpdate(
+      req.params.taskId,
+      { ...req.body },
+      { new: true }
+    );
+    return res.status(201).json({
+      status: "sucssess",
+      data: updatedTask,
+    });
+  } catch (e) {
+    return res.status(404).json({ massage: "error", data: null });
+  }
+};
+
+export const deleteAllTasks = async (req, res) => {
+  try {
+    await taskModel.deleteMany({});
+    taskModel.find({}).then((e) => console.log(e));
+    return res.status(204).json({
+      massage: "sucssess",
+      data: null,
+    });
   } catch (e) {
     console.error(e);
     return res.status(404).json({ massage: "error", data: null });
