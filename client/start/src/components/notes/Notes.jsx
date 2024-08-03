@@ -1,17 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { auth } from "../../../config/fire-base";
 import axios from "axios";
+import { onAuthStateChanged } from "firebase/auth";
 export default function Notes() {
   const [tasks, setTasks] = useState([]);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [editedTask, setEditedTask] = useState({ id: null, title: "" });
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      getTask();
+    }
+  }, [user]);
 
   const getTask = async () => {
     try {
-      const user = auth.currentUser;
-      if (user !== null) {
-        const userTask = await axios.get(`/api/tasks/${user.uid}`);
+      console.log(auth.currentUser);
+      if (auth.currentUser !== null) {
+        const userTask = await axios.get(`/api/users/${auth.currentUser.uid}`);
+        console.log("hihihiih");
+        console.log(userTask);
+        setTasks(userTask.data);
+      } else {
+        console.log("worng");
       }
     } catch (e) {
       console.error(e);
@@ -29,37 +52,64 @@ export default function Notes() {
     try {
       const newTask = await axios.post("/api/tasks", newTaskData);
       console.log(newTask.data);
+      setTasks([...tasks, newTask.data]);
     } catch (e) {
       console.error(e);
     }
   };
 
-  const deleteTask = (taskId) => {
-    const updatedTasks = tasks.filter((task) => task.id !== taskId);
-    setTasks(updatedTasks);
+  const deleteTask = async (taskId) => {
+    try {
+      const del = await axios.delete(`/api/tasks/${taskId}`);
+      console.log(del);
+      const updatedTasks = tasks.filter((task) => task._id !== taskId);
+      setTasks(updatedTasks);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const toggleComplete = (taskId, completed) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, completed: !completed } : task
-    );
-    setTasks(updatedTasks);
+  const toggleComplete = async (taskId, completed) => {
+    try {
+      const task = tasks.find((e) => e._id === taskId);
+      const pt = await axios.put(`/api/tasks/${taskId}`, {
+        ...task,
+        completed: !completed,
+      });
+      console.log(pt)
+      const updatedTasks = tasks.map((task) =>
+        task._id === taskId ? { ...task, completed: !completed } : task
+      );
+      setTasks(updatedTasks);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const startEditing = (task) => {
-    setEditedTask({ id: task.id, title: task.title });
+    setEditedTask({ id: task._id, title: task.title });
   };
 
   const cancelEdit = () => {
     setEditedTask({ id: null, title: "" });
   };
 
-  const saveEditedTask = () => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === editedTask.id ? { ...task, title: editedTask.title } : task
-    );
-    setTasks(updatedTasks);
-    cancelEdit();
+  const saveEditedTask = async () => {
+    try {
+      console.log(editedTask);
+      const task = tasks.find((e) => e._id === editedTask.id);
+      const pt = await axios.put(`/api/tasks/${editedTask.id}`, {
+        ...task,
+        title: editedTask.title,
+      });
+      const updatedTasks = tasks.map((task) =>
+        task._id === editedTask.id ? { ...task, title: editedTask.title } : task
+      );
+      setTasks(updatedTasks);
+      cancelEdit();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
@@ -93,69 +143,72 @@ export default function Notes() {
       </button>
 
       <ul className="mt-5 space-y-3">
-        {tasks.map((task) => (
-          <li
-            key={task.id}
-            className="border border-gray-500 rounded-md px-4 py-3 flex items-center justify-between"
-          >
-            {editedTask.id === task.id ? (
-              <div className="flex space-x-3 items-center">
-                <input
-                  type="text"
-                  value={editedTask.title}
-                  onChange={(e) =>
-                    setEditedTask({ ...editedTask, title: e.target.value })
-                  }
-                  className="border border-gray-300 px-3 py-2 rounded-md w-full"
-                />
-                <button
-                  onClick={saveEditedTask}
-                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={cancelEdit}
-                  className="bg-gray-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
-                >
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <div className="flex space-x-3 items-center">
-                <span
-                  className={
-                    task.completed ? "line-through text-gray-500" : "text-black"
-                  }
-                >
-                  {task.name}: {task.title}
-                </span>
-                <button
-                  onClick={() => toggleComplete(task.id, task.completed)}
-                  className={
-                    task.completed
-                      ? "bg-yellow-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
-                      : "bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
-                  }
-                >
-                  {task.completed ? "Deselect" : "Mark"}
-                </button>
-                <button
-                  onClick={() => startEditing(task)}
-                  className="bg-orange-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => deleteTask(task.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
-                >
-                  Delete
-                </button>
-              </div>
-            )}
-          </li>
-        ))}
+        {tasks &&
+          tasks.map((task) => (
+            <li
+              key={task._id}
+              className="border border-gray-500 rounded-md px-4 py-3 flex items-center justify-between"
+            >
+              {editedTask.id === task._id ? (
+                <div className="flex space-x-3 items-center">
+                  <input
+                    type="text"
+                    value={editedTask.title}
+                    onChange={(e) =>
+                      setEditedTask({ ...editedTask, title: e.target.value })
+                    }
+                    className="border border-gray-300 px-3 py-2 rounded-md w-full"
+                  />
+                  <button
+                    onClick={saveEditedTask}
+                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={cancelEdit}
+                    className="bg-gray-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="flex space-x-3 items-center">
+                  <span
+                    className={
+                      task.completed
+                        ? "line-through text-gray-500"
+                        : "text-black"
+                    }
+                  >
+                    {task.name}: {task.title}
+                  </span>
+                  <button
+                    onClick={() => toggleComplete(task._id, task.completed)}
+                    className={
+                      task.completed
+                        ? "bg-yellow-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
+                        : "bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+                    }
+                  >
+                    {task.completed ? "Deselect" : "Mark"}
+                  </button>
+                  <button
+                    onClick={() => startEditing(task)}
+                    className="bg-orange-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => deleteTask(task._id)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
+            </li>
+          ))}
       </ul>
     </div>
   );
