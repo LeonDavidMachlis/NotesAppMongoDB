@@ -5,17 +5,22 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import SignIn from "./components/signIn";
 import Login from "./components/LogIn";
-import Notes from "./components/notes";
+import Notes from "./components/notes/Notes";
+import Home from "./components/home/Home.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    errorElement: <div>worng path</div>,
+    errorElement: <div>Wrong path</div>,
     children: [
       {
+        path: "/",
+        element: <Home />,
+      },
+      {
         path: "/notes",
-        element: <Notes/>,
+        element: <Notes />,
       },
     ],
   },
@@ -24,7 +29,7 @@ const router = createBrowserRouter([
     element: <SignIn />,
   },
   {
-    path: "/LogIn",
+    path: "/logIn",
     element: <Login />,
   },
 ]);

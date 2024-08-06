@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import "./index.css";
 import axios from "axios";
 import NavBar from "./components/NavBar";
-import Notes from "./components/notes/Notes";
 import { Outlet } from "react-router-dom";
 
 function App() {
@@ -13,10 +12,11 @@ function App() {
     };
     f();
   }, []);
+
   return (
     <div className="min-h-screen">
-        <NavBar />
-        <Outlet/>
+      <NavBar />
+      <Outlet />
     </div>
   );
 }
