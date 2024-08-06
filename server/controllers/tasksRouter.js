@@ -15,8 +15,9 @@ export const postTask = async (req, res) => {
   try {
     console.log(req.body);
     const newTask = new taskModel({ ...req.body });
-    await newTask.save();
-    return res.status(201).json(req.body);
+   const ret =  await newTask.save();
+   console.log(ret)
+    return res.status(201).json(ret);
   } catch (e) {
     return res.status(404).json({ massage: "error", data: null });
   }
