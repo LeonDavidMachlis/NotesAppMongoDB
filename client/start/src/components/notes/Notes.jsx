@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { auth } from "../../../config/fire-base";
 import axios from "axios";
 import { onAuthStateChanged } from "firebase/auth";
+
 export default function Notes() {
   const [tasks, setTasks] = useState([]);
   const [newTaskName, setNewTaskName] = useState("");
@@ -76,7 +77,7 @@ export default function Notes() {
         ...task,
         completed: !completed,
       });
-      console.log(pt)
+      console.log(pt);
       const updatedTasks = tasks.map((task) =>
         task._id === taskId ? { ...task, completed: !completed } : task
       );
@@ -115,6 +116,7 @@ export default function Notes() {
   return (
     <div className="mt-5 mx-auto max-w-2xl">
       <h1 className="text-center text-3xl font-bold mb-4">Tasks List</h1>
+      {user && <h2 className="text-center text-xl font-bold mb-4">Welcome back: {user.email}</h2>}
       <div className="mb-4">
         <label className="block mb-1">Task Name</label>
         <input
@@ -178,7 +180,7 @@ export default function Notes() {
                     className={
                       task.completed
                         ? "line-through text-gray-500"
-                        : "text-black"
+                        : "text-white"
                     }
                   >
                     {task.name}: {task.title}
