@@ -77,7 +77,7 @@ export default function Notes() {
         ...task,
         completed: !completed,
       });
-      console.log(pt);
+      console.log(pt)
       const updatedTasks = tasks.map((task) =>
         task._id === taskId ? { ...task, completed: !completed } : task
       );
